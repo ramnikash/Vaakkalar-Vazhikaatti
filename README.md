@@ -10,4 +10,4 @@ A wahl-o-mat styled election compass.
 - Redo end screen:
   - Compare answers with parties
   - Add reference to party manifestos for said comparisons
-- 
+- Add more local parties
