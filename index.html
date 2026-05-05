@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Election Matcher</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background-color: #f4f4f9; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            width: 90%; 
+            max-width: 500px; 
+            text-align: center; 
+        }
+        .btn { 
+            padding: 12px 20px; 
+            margin: 5px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold;
+            transition: 0.2s; 
+        }
+        .btn-agree { background: #4CAF50; color: white; }
+        .btn-neutral { background: #9E9E9E; color: white; }
+        .btn-disagree { background: #F44336; color: white; }
+        .btn-skip { background: #E0E0E0; color: #333; margin-top: 15px; width: 100%; font-weight: normal; }
+        .btn:hover { opacity: 0.8; }
+        .progress { color: #666; font-size: 14px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;}
+        .result-item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 15px 10px; 
+            border-bottom: 1px solid #eee; 
+            font-size: 18px;
+        }
+        .result-item:last-child { border-bottom: none; }
+        .party-name { font-weight: bold; }
+        h2 { margin-bottom: 30px; color: #222; }
+    </style>
+</head>
+<body>
+
+<div class="card" id="app">
+    <!-- JavaScript will inject the questions and results here -->
+</div>
+
+<script>
+    // ==========================================
+    // 1. CUSTOMIZE YOUR DATA HERE
+    // Values: 1 = Agree, 0 = Neutral, -1 = Disagree
+    // ==========================================
+    const questions = [
+        { id: 'q1', text: "The government should lower income taxes." },
+        { id: 'q2', text: "Public transport should be completely free." },
+        { id: 'q3', text: "We need stricter environmental regulations." }
+    ];
+
+    const parties = [
+        { name: "Progressive Party", answers: { q1: -1, q2: 1, q3: 1 } },
+        { name: "Conservative Party", answers: { q1: 1, q2: -1, q3: -1 } },
+        { name: "Centrist Party", answers: { q1: 0, q2: 0, q3: 1 } }
+    ];
+
+    // ==========================================
+    // 2. APP LOGIC & MATCHING ALGORITHM
+    // ==========================================
+    let currentQuestionIndex = 0;
+    let userAnswers = {};
+    const appDiv = document.getElementById('app');
+
+    function renderQuestion() {
+        if (currentQuestionIndex >= questions.length) {
+            return showResults();
+        }
+
+        const q = questions[currentQuestionIndex];
+        appDiv.innerHTML = `
+            <div class="progress">Question ${currentQuestionIndex + 1} of ${questions.length}</div>
+            <h2>"${q.text}"</h2>
+            <button class="btn btn-agree" onclick="answerQuestion('${q.id}', 1)">Agree</button>
+            <button class="btn btn-neutral" onclick="answerQuestion('${q.id}', 0)">Neutral</button>
+            <button class="btn btn-disagree" onclick="answerQuestion('${q.id}', -1)">Disagree</button>
+            <br>
+            <button class="btn btn-skip" onclick="answerQuestion('${q.id}', null)">Skip Question</button>
+        `;
+    }
+
+    function answerQuestion(questionId, value) {
+        if (value !== null) {
+            userAnswers[questionId] = value;
+        }
+        currentQuestionIndex++;
+        renderQuestion();
+    }
+
+    function showResults() {
+        // The core SVT-style matching logic
+        let results = parties.map(party => {
+            let totalPossibleDiff = 0;
+            let totalDiff = 0;
+
+            questions.forEach(q => {
+                let uA = userAnswers[q.id];
+                let pA = party.answers[q.id];
+
+                // Calculate only if the user answered and the party has a stance
+                if (uA !== undefined && pA !== undefined) {
+                    totalPossibleDiff += 2; // The maximum difference between 1 (Agree) and -1 (Disagree) is 2
+                    totalDiff += Math.abs(uA - pA);
+                }
+            });
+
+            let matchPercentage = 0;
+            if (totalPossibleDiff > 0) {
+                matchPercentage = ((totalPossibleDiff - totalDiff) / totalPossibleDiff) * 100;
+            }
+
+            return { name: party.name, match: Math.round(matchPercentage) };
+        });
+
+        // Sort from highest match to lowest match
+        results.sort((a, b) => b.match - a.match);
+
+        // Build the results UI
+        let resultsHTML = '<h2>Your Best Matches</h2>';
+        results.forEach(r => {
+            resultsHTML += `
+                <div class="result-item">
+                    <span class="party-name">${r.name}</span>
+                    <span>${r.match}% Match</span>
+                </div>
+            `;
+        });
+        resultsHTML += `<button class="btn btn-skip" onclick="location.reload()">Retake the Test</button>`;
+        appDiv.innerHTML = resultsHTML;
+    }
+
+    // Start the app when the page loads
+    renderQuestion();
+</script>
+
+</body>
+</html>
