@@ -34,7 +34,9 @@
             transition: 0.2s; 
         }
         .btn-agree { background: #4CAF50; color: white; }
+		.btn-partly-agree { background: #8BC34A; color: white; }
         .btn-neutral { background: #9E9E9E; color: white; }
+		.btn-partly-disagree { background: #FF9800; color: white; }
         .btn-disagree { background: #F44336; color: white; }
         .btn-skip { background: #E0E0E0; color: #333; margin-top: 15px; width: 100%; font-weight: normal; }
         .btn:hover { opacity: 0.8; }
@@ -63,15 +65,36 @@
     // Values: 1 = Agree, 0 = Neutral, -1 = Disagree
     // ==========================================
     const questions = [
-        { id: 'q1', text: "The government should lower income taxes." },
-        { id: 'q2', text: "Public transport should be completely free." },
-        { id: 'q3', text: "We need stricter environmental regulations." }
+        { id: 'q1', text: "The state should provide direct cash transfers and free household appliances to women below a certain income level." },
+        { id: 'q2', text: "Tamil Nadu should progressively implement total prohibition and strengthen anti-drug enforcement." },
+        { id: 'q3', text: "A certain percentage of jobs in both government and private sectors should be reserved for residents of Tamil Nadu." },
+		{ id: 'q4', text: "Tamil Nadu should continue its two-language policy (Tamil & English) and oppose any attempts to impose a third language." },
+		{ id: 'q5', text: "The 7.5% horizontal reservation for government school students in medical/engineering admissions should be increased" },
+		{ id: 'q6', text: "The state should waive all farm loans and provide a legal guarantee for Minimum Support Price (MSP)." },
+		{ id: 'q7', text: "The state should provide free electricity, LPG cylinders, and piped drinking water to all households." },
+		{ id: 'q8', text: "The state should restore the Old Pension Scheme (OPS) for all government employees." },
+		{ id: 'q9', text: "The state government should conduct a comprehensive caste census." },
+		{ id: 'q10', text: "Environmental protection—including phasing out chemical pesticides, restoring water bodies, and promoting organic farming—should be prioritized over industrial development." },
+		{ id: 'q11', text: "Administrative functions should be decentralized away from Chennai, for example by creating multiple capitals." },
+		{ id: 'q12', text: "The government must impose harsher punishments (including capital punishment) and create a dedicated task force to eradicate crimes against women and drugs." },
+		{ id: 'q13', text: "Tamil Nadu should resist any central government policy that reduces its parliamentary representation or undermines federalism (e.g., delimitation based on population)." },
+		{ id: 'q14', text: "The state must take firm steps to retrieve Katchatheevu from Sri Lanka and secure dual citizenship for Sri Lankan Tamil refugees." },
+		{ id: 'q15', text: "The state should establish an AI ministry and heavily invest in AI for education and governance reforms." },
+		{ id: 'q16', text: "The state must pursue the complete abolition of the NEET examination for medical admissions in Tamil Nadu and return the subject of education entirely to the State List." },
+		{ id: 'q17', text: "The construction of mega-infrastructure projects, such as the Parandur greenfield airport, must proceed even if it requires the acquisition of fertile agricultural lands." }
     ];
 
     const parties = [
-        { name: "Progressive Party", answers: { q1: -1, q2: 1, q3: 1 } },
-        { name: "Conservative Party", answers: { q1: 1, q2: -1, q3: -1 } },
-        { name: "Centrist Party", answers: { q1: 0, q2: 0, q3: 1 } }
+        { name: "DMK", answers: { q1: 1, q2: 0.5, q3: 0, q4: 1, q5: 0.5, q6: 0.5, q7: 0.5, q8: -1, q9: 0, q10: 0.5, q11: -1, q12: -0.5, q13: 1, q14: 0.5, q15: 0.5, q16: 1, q17: 1 } },
+        { name: "AIADMK", answers: { q1: 1, q2: 0.5, q3: 1, q4: 1, q5: 1, q6: 1, q7: 0.5, q8: 1, q9: 0.5, q10: -0.5, q11: -1, q12: 1, q13: 0.5, q14: 1, q15: -0.5, q16: 0.5, q17: 0.5 } },
+        { name: "TVK", answers: { q1: 1, q2: 1, q3: 0.5, q4: 1, q5: 1, q6: 1, q7: 1, q8: 1, q9: 1, q10: 0.5, q11: -1, q12: 1, q13: 1, q14: 1, q15: 1, q16: 1, q17: -1 } }
+		{ name: "NTK", answers: { q1: -1, q2: 1, q3: 1, q4: 1, q5: 0.5, q6: 1, q7: 0.5, q8: 0.5, q9: 0, q10: 1, q11: 1, q12: 1, q13: 1, q14: 1, q15: 0.5, q16: 1, q17: -1 } },
+		{ name: "AMMK", answers: { q1: 0, q2: 0.5, q3: 1, q4: 1, q5: 0, q6: 1, q7: 0, q8: 1, q9: 0, q10: 0, q11: 0, q12: 0.5, q13: 0.5, q14: 0, q15: 0, q16: 0.5, q17: -1 } },
+		{ name: "BJP", answers: { q1: 1, q2: 1, q3: -1, q4: -1, q5: 0, q6: 0.5, q7: 0.5, q8: -0.5, q9: -1, q10: -0.5, q11: 0.5, q12: 1, q13: -1, q14: 0.5, q15: 0.5, q16: -1, q17: 1 } },
+		{ name: "VCK", answers: { q1: 1, q2: 0, q3: 0.5, q4: 1, q5: 1, q6: 0, q7: 0, q8: 0, q9: 1, q10: 0, q11: 0, q12: 0.5, q13: 1, q14: 0, q15: 0, q16: 1, q17: -1 } },
+		{ name: "PMK", answers: { q1: 0.5, q2: 1, q3: 0, q4: 0, q5: 0, q6: 1, q7: 0, q8: 0, q9: 1, q10: 0, q11: 0, q12: 0.5, q13: 0, q14: 0, q15: 0, q16: 1, q17: -1 } },
+		{ name: "TMC(M)", answers: { q1: 0.5, q2: 0.5, q3: 1, q4: 0, q5: 0, q6: 0.5, q7: 0, q8: 0.5, q9: 0, q10: 0.5, q11: 0, q12: 0.5, q13: 0, q14: 0, q15: 0, q16: -1, q17: 1 } },
+		{ name: "INC", answers: { q1: 1, q2: 0.5, q3: 0.5, q4: 1, q5: 1, q6: 1, q7: 0.5, q8: 1, q9: 1, q10: -0.5, q11: -1, q12: 0.5, q13: 1, q14: -0.5, q15: 0.5, q16: 0.5, q17: 0.5 } }
     ];
 
     // ==========================================
@@ -90,9 +113,11 @@
         appDiv.innerHTML = `
             <div class="progress">Question ${currentQuestionIndex + 1} of ${questions.length}</div>
             <h2>"${q.text}"</h2>
-            <button class="btn btn-agree" onclick="answerQuestion('${q.id}', 1)">Agree</button>
+            <button class="btn btn-agree" onclick="answerQuestion('${q.id}', 1)">Strongly Agree</button>
+            <button class="btn btn-partly-agree" onclick="answerQuestion('${q.id}', 0.5)">Partly Agree</button>
             <button class="btn btn-neutral" onclick="answerQuestion('${q.id}', 0)">Neutral</button>
-            <button class="btn btn-disagree" onclick="answerQuestion('${q.id}', -1)">Disagree</button>
+            <button class="btn btn-partly-disagree" onclick="answerQuestion('${q.id}', -0.5)">Partly Disagree</button>
+            <button class="btn btn-disagree" onclick="answerQuestion('${q.id}', -1)">Strongly Disagree</button>
             <br>
             <button class="btn btn-skip" onclick="answerQuestion('${q.id}', null)">Skip Question</button>
         `;
